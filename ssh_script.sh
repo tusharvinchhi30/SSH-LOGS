@@ -1,5 +1,4 @@
 #!/bin/bash
-# This is a test
 
 # Source the configuration file
 source config.sh
@@ -82,32 +81,42 @@ construct_grep_command() {
     SSH_COMMAND="${SSH_COMMAND%&&}"
 }
 
-# Prompt the user for action and transaction ID
-prompt_user
+# Main loop to repeat the process based on user input
+while true; do
+    # Prompt the user for action and transaction ID
+    prompt_user
 
-# Define the SSH command and log file name based on user input
-case $ACTION in
-    1)
-        echo "Getting Logs for ${TRANSACTION_ID}....."
-        OUTPUT_FILE="logs/grep-${TRANSACTION_ID}.log"
-        construct_grep_command
-        
-        # Execute the SSH command and handle empty outputs
-        ssh $USER@$SERVER "$SSH_COMMAND" > "$OUTPUT_FILE" 2>&1
-        ;;
-    2)
-        prompt_file_selection
-        prompt_grep_option
-        echo "Getting Logs from ${TAIL_FILE}....."
-        TIMESTAMP=$(date +"%Y%m%d%H%M%S")
-        OUTPUT_FILE="logs/Tail-${TAIL_FILE}-${TRANSACTION_ID}-${TIMESTAMP}.log"
-        SSH_COMMAND="cd /data/ATC/MobifinEliteServices/LogEvent/logs/ && timeout $TAIL_TIMEOUT tail -f $TAIL_FILE${GREP_COMMAND}"
-        
-        # Execute the SSH command and handle empty outputs
-        ssh $USER@$SERVER "$SSH_COMMAND" > "$OUTPUT_FILE" 2>&1
-        ;;
-esac
+    # Define the SSH command and log file name based on user input
+    case $ACTION in
+        1)
+            echo "Getting Logs for ${TRANSACTION_ID} ....."
+            OUTPUT_FILE="logs/grep-${TRANSACTION_ID}.log"
+            construct_grep_command
+            
+            
+            ssh $USER@$SERVER "$SSH_COMMAND" > "$OUTPUT_FILE" 2>&1
+            ;;
+        2)
+            prompt_file_selection
+            prompt_grep_option
+            echo "Getting Logs from ${TAIL_FILE}....."
+            TIMESTAMP=$(date +"%Y%m%d%H%M%S")
+            OUTPUT_FILE="logs/Tail-${TAIL_FILE}-${TRANSACTION_ID}-${TIMESTAMP}.log"
+            SSH_COMMAND="cd /data/ATC/MobifinEliteServices/LogEvent/logs/ && timeout $TAIL_TIMEOUT tail -f $TAIL_FILE${GREP_COMMAND}"
+            
+            
+            ssh $USER@$SERVER "$SSH_COMMAND" > "$OUTPUT_FILE" 2>&1
+            ;;
+    esac
 
-echo "Script completed."
-echo "Logs Generated at :- ${OUTPUT_FILE}"
-sleep 10
+    echo "Script completed."
+    echo "Logs Generated at :- ${OUTPUT_FILE}"
+
+    # Ask if the user wants to repeat the process
+    read -p "Do you want to repeat the process? (y/n): " REPEAT_OPTION
+
+    if [[ "$REPEAT_OPTION" != "y" && "$REPEAT_OPTION" != "Y" ]]; then
+        echo "Exiting the script."
+        break
+    fi
+done
