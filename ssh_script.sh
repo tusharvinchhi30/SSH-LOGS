@@ -1,5 +1,6 @@
 #!/bin/bash
-#
+# This is a test
+
 # Source the configuration file
 source config.sh
 
