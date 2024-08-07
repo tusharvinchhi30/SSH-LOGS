@@ -69,7 +69,7 @@ prompt_grep_option() {
 
 # Function to construct SSH command for grep action
 construct_grep_command() {
-    SSH_COMMAND="cd /data/ATC/MobifinEliteServices/LogEvent/logs/ &&"
+    SSH_COMMAND="cd /data/${FOLDER_PATH}/MobifinEliteServices/LogEvent/logs/ &&"
 
     for FILE in "${FILES[@]}"; do
         SSH_COMMAND+=" echo 'Results from $FILE for Transaction ID $TRANSACTION_ID:' && 
@@ -102,7 +102,7 @@ while true; do
             echo "Getting Logs from ${TAIL_FILE}....."
             TIMESTAMP=$(date +"%Y%m%d%H%M%S")
             OUTPUT_FILE="logs/Tail-${TAIL_FILE}-${TRANSACTION_ID}-${TIMESTAMP}.log"
-            SSH_COMMAND="cd /data/ATC/MobifinEliteServices/LogEvent/logs/ && timeout $TAIL_TIMEOUT tail -f $TAIL_FILE${GREP_COMMAND}"
+            SSH_COMMAND="cd /data/${FOLDER_PATH}/MobifinEliteServices/LogEvent/logs/ && timeout $TAIL_TIMEOUT tail -f $TAIL_FILE${GREP_COMMAND}"
             
             
             ssh $USER@$SERVER "$SSH_COMMAND" > "$OUTPUT_FILE" 2>&1
